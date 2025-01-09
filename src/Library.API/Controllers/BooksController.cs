@@ -38,7 +38,7 @@ namespace Library.Controllers
         public async Task<ActionResult<BookDTO>> CreateBook(CreateBookCommand command)
         {
             var result = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetBookById), new { id = result.Id }, result);
+            return Ok(result);
         }
     }
 }
