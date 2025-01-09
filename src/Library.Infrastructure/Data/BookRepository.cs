@@ -1,6 +1,8 @@
 using Library.Domain.Entities;
 using Library.Domain.Interfaces;
 using NHibernate;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Library.Infrastructure.Data
 {
