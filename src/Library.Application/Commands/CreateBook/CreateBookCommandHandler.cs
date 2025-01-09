@@ -1,28 +1,28 @@
 using AutoMapper;
 using Library.Application.DTOs;
-using Library.Application.Interfaces;
+using Library.Domain.Entities;
+using Library.Domain.Interfaces;
 using MediatR;
 
 namespace Library.Application.Commands.CreateBook
 {
     public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, BookDTO>
     {
-        private readonly IBooksService _booksService;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CreateBookCommandHandler(IMapper mapper)
+        public CreateBookCommandHandler(IMapper mapper, IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
-        }
-
-        public CreateBookCommandHandler(IBooksService booksService)
-        {
-            _booksService = booksService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<BookDTO> Handle(CreateBookCommand request, CancellationToken cancellationToken)
         {
-            return await _booksService.CreateBookAsync(request);
+            var book = _mapper.Map<Book>(request);
+            await _unitOfWork.BookRepository.AddAsync(book);
+            _unitOfWork.Commit();
+            return _mapper.Map<BookDTO>(book);
         }
     }
 }

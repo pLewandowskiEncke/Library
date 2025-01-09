@@ -1,4 +1,7 @@
 using Library.Application.Commands.CreateBook;
+using Library.Application.DTOs;
+using Library.Application.Queries.GetBookById;
+using Library.Application.Queries.GetBooks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,13 +18,27 @@ namespace Library.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateBook(CreateBookCommand command)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<BookDTO>> GetBookById(int id)
         {
-            var result = await _mediator.Send(command);
+            var query = new GetBookByIdQuery(id);
+            var result = await _mediator.Send(query);
             return Ok(result);
         }
 
-        // Other CRUD endpoints
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<BookDTO>>> GetBooks()
+        {
+            var query = new GetBooksQuery();
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<BookDTO>> CreateBook(CreateBookCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetBookById), new { id = result.Id }, result);
+        }
     }
 }
