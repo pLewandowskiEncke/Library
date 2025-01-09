@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Library.Contracts\Library.Contracts.csproj" />
     <ProjectReference Include="..\Library.Shared\Library.Shared.csproj" />
   </ItemGroup>
 
