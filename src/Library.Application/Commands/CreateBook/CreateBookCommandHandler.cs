@@ -19,6 +19,7 @@ namespace Library.Application.Commands.CreateBook
 
         public async Task<BookDTO> Handle(CreateBookCommand request, CancellationToken cancellationToken)
         {
+            _unitOfWork.BeginTransaction();
             var book = _mapper.Map<Book>(request);
             await _unitOfWork.BookRepository.AddAsync(book);
             _unitOfWork.Commit();
