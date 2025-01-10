@@ -8,6 +8,7 @@ using Library.Domain.Interfaces;
 using Library.Shared.Exceptions;
 using Moq;
 using Moq.AutoMock;
+using System.Reflection;
 using Xunit;
 
 namespace Library.Application.Tests.Commands.UpdateBook
@@ -58,12 +59,14 @@ namespace Library.Application.Tests.Commands.UpdateBook
                 .WithMessage("Invalid state");
         }
 
+        // ...
+
         [Fact]
         public async Task Handle_ShouldUpdateBookState_WhenValidState()
         {
             // Arrange
-            var book = new Book();
-            var command = new UpdateBookCommand { Id = 1, Status = BookStatus.Borrowed };
+            var book = new CustomBook(BookStatus.Borrowed) { Id = 1 };
+            var command = new UpdateBookCommand { Id = 1, Status = BookStatus.Returned };
             _mocker.GetMock<IUnitOfWork>()
                 .Setup(u => u.BookRepository.GetByIdAsync(It.IsAny<int>()))
                 .ReturnsAsync(book);
@@ -77,7 +80,10 @@ namespace Library.Application.Tests.Commands.UpdateBook
 
             // Assert
             _mocker.GetMock<IUnitOfWork>().Verify(u => u.BeginTransaction(), Times.Once);
-            _mocker.GetMock<IUnitOfWork>().Verify(u => u.BookRepository.UpdateAsync(book), Times.Once);
+            _mocker.GetMock<IUnitOfWork>().Verify(u => u.BookRepository.UpdateAsync(It.Is<Book>(
+                book => book.Id == 1 &&
+                book.Status == BookStatus.Returned
+                )), Times.Once);
             _mocker.GetMock<IUnitOfWork>().Verify(u => u.Commit(), Times.Once);
             result.Should().BeEquivalentTo(expected);
         }
@@ -118,6 +124,14 @@ namespace Library.Application.Tests.Commands.UpdateBook
                     book.Verify(b => b.MarkAsDamaged(), Times.Once);
                     break;
             }
+        }
+    }
+
+    internal class CustomBook : Book
+    {
+        public CustomBook(BookStatus status)
+        {
+            Status = status;    
         }
     }
 }

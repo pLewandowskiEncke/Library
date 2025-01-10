@@ -1,11 +1,11 @@
 using Library.Domain.BookStates;
+using Library.Domain.Enums;
 using Library.Domain.Interfaces;
 
 namespace Library.Domain.Entities
 {
     public partial class Book
     {
-        private IBookState _currentState;
         public Book()
         {
             SetState(new OnTheShelfState()); // Default state
@@ -13,32 +13,43 @@ namespace Library.Domain.Entities
 
         private void SetState(IBookState bookState)
         {
-            _currentState = bookState;
             Status = bookState.Status;
         }
 
         public virtual void Borrow()
         {
-            var nextState = _currentState.Borrow(this);
+            var nextState = GetStateInstance().Borrow(this);
             SetState(nextState);
         }
 
         public virtual void Return()
         {
-            var nextState = _currentState.Return(this);
+            var nextState = GetStateInstance().Return(this);
             SetState(nextState);
         }
 
         public virtual void MarkAsDamaged()
         {
-            var nextState = _currentState.MarkAsDamaged(this);
+            var nextState = GetStateInstance().MarkAsDamaged(this);
             SetState(nextState);
         }
 
         public virtual void PlaceOnShelf()
         {
-            var nextState = _currentState.PlaceOnShelf(this);
+            var nextState = GetStateInstance().PlaceOnShelf(this);
             SetState(nextState);
+        }
+
+        private IBookState GetStateInstance()
+        {
+            return Status switch
+            {
+                BookStatus.OnTheShelf => new OnTheShelfState(),
+                BookStatus.Borrowed => new BorrowedState(),
+                BookStatus.Returned => new ReturnedState(),
+                BookStatus.Damaged => new DamagedState(),
+                _ => throw new InvalidOperationException("Invalid state")
+            };
         }
     }
 }
