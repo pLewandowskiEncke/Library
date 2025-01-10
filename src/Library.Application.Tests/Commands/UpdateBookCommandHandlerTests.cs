@@ -8,7 +8,6 @@ using Library.Domain.Interfaces;
 using Library.Shared.Exceptions;
 using Moq;
 using Moq.AutoMock;
-using System.Reflection;
 using Xunit;
 
 namespace Library.Application.Tests.Commands.UpdateBook
@@ -45,7 +44,7 @@ namespace Library.Application.Tests.Commands.UpdateBook
         public async Task Handle_ShouldThrowInvalidBookStateException_WhenInvalidState()
         {
             // Arrange
-            var book = new Book();
+            var book = new CustomBook(BookStatus.Borrowed) { Id = 1 };
             var command = new UpdateBookCommand { Id = 1, Status = (BookStatus)999 };
             _mocker.GetMock<IUnitOfWork>()
                 .Setup(u => u.BookRepository.GetByIdAsync(It.IsAny<int>()))
@@ -131,7 +130,7 @@ namespace Library.Application.Tests.Commands.UpdateBook
     {
         public CustomBook(BookStatus status)
         {
-            Status = status;    
+            Status = status;
         }
     }
 }

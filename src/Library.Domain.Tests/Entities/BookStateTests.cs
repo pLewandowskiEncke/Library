@@ -1,18 +1,14 @@
 using FluentAssertions;
-using Library.Domain.BookStates;
 using Library.Domain.Entities;
 using Library.Domain.Enums;
-using Library.Domain.Interfaces;
 using Library.Shared.Exceptions;
-using Moq;
 using Xunit;
 
 namespace Library.Domain.Tests.Entities
 {
     public class BookStateTests
     {
-        private readonly Mock<IBookState> _initialStateMock;
-        private readonly Book _book;
+        private Book _book;
 
         public BookStateTests()
         {
@@ -24,8 +20,7 @@ namespace Library.Domain.Tests.Entities
         public void PlaceOnShelf_WhenBookDamaged_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.MarkAsDamaged();
-            _book.Status.Should().Be(BookStatus.Damaged);
+            _book = new CustomBook(BookStatus.Damaged);
 
             // Act
             _book.PlaceOnShelf();
@@ -38,9 +33,7 @@ namespace Library.Domain.Tests.Entities
         public void PlaceOnShelf_WhenBookReturned_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.Borrow();
-            _book.Return();
-            _book.Status.Should().Be(BookStatus.Returned);
+            _book = new CustomBook(BookStatus.Returned);
 
             // Act
             _book.PlaceOnShelf();
@@ -53,7 +46,7 @@ namespace Library.Domain.Tests.Entities
         public void PlaceOnShelf_WhenBookOnTheShelf_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.Status.Should().Be(BookStatus.OnTheShelf);
+            _book = new CustomBook(BookStatus.OnTheShelf);
 
             // Act
             Action act = () => _book.PlaceOnShelf();
@@ -66,8 +59,7 @@ namespace Library.Domain.Tests.Entities
         public void PlaceOnShelf_WhenBookBorrowed_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.Borrow();
-            _book.Status.Should().Be(BookStatus.Borrowed);
+            _book = new CustomBook(BookStatus.Borrowed);
 
             // Act
             Action act = () => _book.PlaceOnShelf();
@@ -82,7 +74,7 @@ namespace Library.Domain.Tests.Entities
         public void Borrow_WhenBookOnTheShelf_ShouldTransitionToNextState()
         {
             // Arrange
-            _book.Status.Should().Be(BookStatus.OnTheShelf);
+            _book = new CustomBook(BookStatus.OnTheShelf);
 
             // Act
             _book.Borrow();
@@ -95,8 +87,7 @@ namespace Library.Domain.Tests.Entities
         public void Borrow_WhenBookBorrowed_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.Borrow();
-            _book.Status.Should().Be(BookStatus.Borrowed);
+            _book = new CustomBook(BookStatus.Borrowed);
 
             // Act
             Action act = () => _book.Borrow();
@@ -109,8 +100,7 @@ namespace Library.Domain.Tests.Entities
         public void Borrow_WhenBookDamaged_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.MarkAsDamaged();
-            _book.Status.Should().Be(BookStatus.Damaged);
+            _book = new CustomBook(BookStatus.Damaged);
 
             // Act
             Action act = () => _book.Borrow();
@@ -123,9 +113,7 @@ namespace Library.Domain.Tests.Entities
         public void Borrow_WhenBookReturned_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.Borrow();
-            _book.Return();
-            _book.Status.Should().Be(BookStatus.Returned);
+            _book = new CustomBook(BookStatus.Returned);
 
             // Act
             Action act = () => _book.Borrow();
@@ -140,7 +128,7 @@ namespace Library.Domain.Tests.Entities
         public void MarkAsDamaged_WhenBookOnTheShelf_ShouldTransitionToNextState()
         {
             // Arrange
-            _book.Status.Should().Be(BookStatus.OnTheShelf);
+            _book = new CustomBook(BookStatus.OnTheShelf);
 
             // Act
             _book.MarkAsDamaged();
@@ -152,10 +140,8 @@ namespace Library.Domain.Tests.Entities
         [Fact]
         public void MarkAsDamaged_WhenBookReturned_ShouldTransitionToNextState()
         {
-            // Arrange
-            _book.Borrow();
-            _book.Return();
-            _book.Status.Should().Be(BookStatus.Returned);
+            // Arrange            
+            _book = new CustomBook(BookStatus.Returned);
 
             // Act
             _book.MarkAsDamaged();
@@ -168,8 +154,7 @@ namespace Library.Domain.Tests.Entities
         public void MarkAsDamaged_WhenBookBorrowed_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.Borrow();
-            _book.Status.Should().Be(BookStatus.Borrowed);
+            _book = new CustomBook(BookStatus.Borrowed);
 
             // Act
             Action act = () => _book.MarkAsDamaged();
@@ -182,8 +167,7 @@ namespace Library.Domain.Tests.Entities
         public void MarkAsDamaged_WhenBookDamaged_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.MarkAsDamaged();
-            _book.Status.Should().Be(BookStatus.Damaged);
+            _book = new CustomBook(BookStatus.Damaged);
 
             // Act
             Action act = () => _book.MarkAsDamaged();
@@ -199,8 +183,7 @@ namespace Library.Domain.Tests.Entities
         public void Return_WhenBookBorrowed_ShouldTransitionToNextState()
         {
             // Arrange
-            _book.Borrow();
-            _book.Status.Should().Be(BookStatus.Borrowed);
+            _book = new CustomBook(BookStatus.Borrowed);
 
             // Act
             _book.Return();
@@ -213,7 +196,7 @@ namespace Library.Domain.Tests.Entities
         public void Return_WhenBookOnTheShelf_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.Status.Should().Be(BookStatus.OnTheShelf);
+            _book = new CustomBook(BookStatus.OnTheShelf);
 
             // Act
             Action act = () => _book.Return();
@@ -226,8 +209,7 @@ namespace Library.Domain.Tests.Entities
         public void Return_WhenBookDamaged_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.MarkAsDamaged();
-            _book.Status.Should().Be(BookStatus.Damaged);
+            _book = new CustomBook(BookStatus.Damaged);
 
             // Act
             Action act = () => _book.Return();
@@ -239,10 +221,8 @@ namespace Library.Domain.Tests.Entities
         [Fact]
         public void Return_WhenBookReturned_ShouldThrowInvalidBookStateException()
         {
-            // Arrange
-            _book.Borrow();
-            _book.Return();
-            _book.Status.Should().Be(BookStatus.Returned);
+            // Arrange            
+            _book = new CustomBook(BookStatus.Returned);
 
             // Act
             Action act = () => _book.Return();
@@ -251,5 +231,13 @@ namespace Library.Domain.Tests.Entities
             act.Should().Throw<InvalidBookStateException>().WithMessage("The book is already returned.");
         }
         #endregion
+    }
+
+    internal class CustomBook : Book
+    {
+        public CustomBook(BookStatus status)
+        {
+            Status = status;
+        }
     }
 }
