@@ -41,7 +41,7 @@ namespace Library.Infrastructure.Data
             }
             finally
             {
-                _transaction.Dispose();
+                _transaction?.Dispose();
                 _transaction = null;
             }
         }
@@ -57,7 +57,7 @@ namespace Library.Infrastructure.Data
             }
             finally
             {
-                _transaction.Dispose();
+                _transaction?.Dispose();
                 _transaction = null;
             }
         }
