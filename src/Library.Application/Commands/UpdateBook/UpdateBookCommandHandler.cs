@@ -1,12 +1,14 @@
 using AutoMapper;
 using Library.Application.DTOs;
 using Library.Domain.Entities;
+using Library.Domain.Enums;
 using Library.Domain.Interfaces;
+using Library.Shared.Exceptions;
 using MediatR;
 
 namespace Library.Application.Commands.CreateBook
 {
-    public class UpdateBookCommandHandler : IRequestHandler<CreateBookCommand, BookDTO>
+    public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, BookDTO>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -17,9 +19,32 @@ namespace Library.Application.Commands.CreateBook
             _mapper = mapper;
         }
 
-        public async Task<BookDTO> Handle(CreateBookCommand request, CancellationToken cancellationToken)
+        public async Task<BookDTO> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
         {
-            var book = _mapper.Map<Book>(request);
+            var book = await _unitOfWork.BookRepository.GetByIdAsync(request.Id);
+            if (book == null)
+            {
+                throw new NotFoundException("Book not found");
+            }
+            _unitOfWork.BeginTransaction();
+            switch (request.Status)
+            {
+                case BookStatus.OnTheShelf:
+                    book.PlaceOnShelf();
+                    break;
+                case BookStatus.Borrowed:
+                    book.Borrow();
+                    break;
+                case BookStatus.Returned:
+                    book.Return();
+                    break;
+                case BookStatus.Damaged:
+                    book.Damage();
+                    break;
+                default:
+                    throw new InvalidBookStateException("Invalid state");
+            }
+
             await _unitOfWork.BookRepository.UpdateAsync(book);
             _unitOfWork.Commit();
             return _mapper.Map<BookDTO>(book);

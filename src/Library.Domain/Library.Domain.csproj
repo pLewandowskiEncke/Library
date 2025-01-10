@@ -10,4 +10,8 @@
     <Folder Include="Interfaces\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Library.Shared\Library.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

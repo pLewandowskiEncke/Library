@@ -38,6 +38,17 @@ namespace Library.Controllers
         public async Task<ActionResult<BookDTO>> CreateBook(CreateBookCommand command)
         {
             var result = await _mediator.Send(command);
+
+            var uri = Url.Action(nameof(GetBookById), nameof(BooksController), new { id = result.Id }, Request.Scheme);
+
+            return Created(uri, result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<BookDTO>> UpdateBook(int id, UpdateBookCommand command)
+        {
+            command.Id = id;
+            var result = await _mediator.Send(command);
             return Ok(result);
         }
     }

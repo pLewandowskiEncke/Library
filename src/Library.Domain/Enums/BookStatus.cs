@@ -2,7 +2,7 @@
 {
     public enum BookStatus
     {
-        OnTheShelf,
+        OnTheShelf = 1,
         Borrowed,
         Returned,
         Damaged

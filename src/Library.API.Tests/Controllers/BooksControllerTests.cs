@@ -7,7 +7,9 @@ using Library.Application.Queries.GetBooks;
 using Library.Controllers;
 using Library.Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Moq;
 using Moq.AutoMock;
 using Xunit;
@@ -25,27 +27,43 @@ namespace Library.API.Tests.Controllers
             _fixture = new Fixture();
             _mocker = new AutoMocker();
             _controller = _mocker.CreateInstance<BooksController>();
+
+            // Set up the HttpContext for the controller
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Scheme = "https";
+            httpContext.Request.Host = new HostString("localhost");
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = httpContext
+            };
         }
 
         [Fact]
-        public async Task CreateBook_ShouldReturnsOkResult()
+        public async Task CreateBook_ShouldReturnsCreatedResult()
         {
-            // Arrange
-            
+            // Arrange            
             var command = _fixture.Create<CreateBookCommand>();
-            var bookDto = _fixture.Create<BookDTO>();
+            var bookDto = _fixture.Build<BookDTO>().With(x => x.Id, 1).Create();
             _mocker.GetMock<IMediator>()
                 .Setup(m => m.Send(It.IsAny<CreateBookCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(bookDto);
+
+            // Set up the UrlHelper for the controller
+            var urlHelperMock = new Mock<IUrlHelper>();
+            urlHelperMock.Setup(x => x.Action(It.IsAny<UrlActionContext>()))
+                .Returns($"foo");
+            _controller.Url = urlHelperMock.Object;
 
             // Act
             var result = await _controller.CreateBook(command);
 
             // Assert
             result.Should().BeOfType<ActionResult<BookDTO>>();
-            var okResult = result.Result as OkObjectResult;
-            okResult.Value.Should().Be(bookDto);
+            var createdResult = result.Result as CreatedResult;
+            createdResult.Value.Should().Be(bookDto);
+            createdResult.Location.Should().Contain($"foo");
         }
+
         [Fact]
         public async Task GetBookById_ShouldReturnOkResult()
         {
