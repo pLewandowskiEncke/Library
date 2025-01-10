@@ -36,20 +36,6 @@ namespace Library.Infrastructure.Tests.Data
         }
 
         [Fact]
-        public async Task GetAllAsync_ShouldReturnAllBooks()
-        {
-            // Arrange
-            var expectedBooks = new List<Book> { new Book { Id = 1 }, new Book { Id = 2 } };
-            _sessionMock.Setup(s => s.QueryOver<Book>().ListAsync<Book>(It.IsAny<CancellationToken>())).ReturnsAsync(expectedBooks);
-
-            // Act
-            var result = await _bookRepository.GetAllAsync();
-
-            // Assert
-            result.Should().BeEquivalentTo(expectedBooks);
-        }
-
-        [Fact]
         public async Task AddAsync_ShouldAddBook()
         {
             // Arrange

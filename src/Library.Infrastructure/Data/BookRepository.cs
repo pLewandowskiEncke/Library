@@ -21,11 +21,6 @@ namespace Library.Infrastructure.Data
             return await _session.GetAsync<Book>(id);
         }
 
-        public async Task<IEnumerable<Book>> GetAllAsync()
-        {
-            return await _session.QueryOver<Book>().ListAsync();
-        }
-
         public async Task AddAsync(Book book)
         {
             await _session.SaveAsync(book);
