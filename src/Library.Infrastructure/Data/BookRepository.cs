@@ -1,6 +1,7 @@
 using Library.Domain.Entities;
 using Library.Domain.Interfaces;
 using NHibernate;
+using NHibernate.Criterion;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -38,6 +39,27 @@ namespace Library.Infrastructure.Data
         public async Task DeleteAsync(Book book)
         {
             await _session.DeleteAsync(book);
+        }
+
+        public async Task<IEnumerable<Book>> GetBooks(int pageNumber, int pageSize, string sortBy, bool ascending)
+        {
+            var criteria = _session.CreateCriteria<Book>();
+
+            // Apply sorting
+            if (ascending)
+            {
+                criteria.AddOrder(Order.Asc(sortBy));
+            }
+            else
+            {
+                criteria.AddOrder(Order.Desc(sortBy));
+            }
+
+            // Apply paging
+            criteria.SetFirstResult((pageNumber - 1) * pageSize);
+            criteria.SetMaxResults(pageSize);
+
+            return await criteria.ListAsync<Book>();
         }
     }
 }

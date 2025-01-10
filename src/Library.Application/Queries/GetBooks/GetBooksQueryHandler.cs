@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Library.Application.Queries.GetBooks
 {
-    public class GetBooksQueryHandler : IRequestHandler<GetBooksQuery, IEnumerable<BookDTO>>
+    public class GetBooksQueryHandler : IRequestHandler<GetBooksQuery, BookListDTO>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -16,10 +16,17 @@ namespace Library.Application.Queries.GetBooks
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<BookDTO>> Handle(GetBooksQuery request, CancellationToken cancellationToken)
+        public async Task<BookListDTO> Handle(GetBooksQuery request, CancellationToken cancellationToken)
         {
-            var books = await _unitOfWork.BookRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<BookDTO>>(books);
+            var books = await _unitOfWork.BookRepository.GetBooks(request.PageNumber, request.PageSize, request.SortBy, request.Ascending);
+            return new BookListDTO
+            {
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                SortBy = request.SortBy,
+                Ascending = request.Ascending,
+                Books = _mapper.Map<IEnumerable<BookDTO>>(books)
+            };
         }
     }
 }

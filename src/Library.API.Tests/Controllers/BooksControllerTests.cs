@@ -87,16 +87,17 @@ namespace Library.API.Tests.Controllers
         public async Task GetBooks_ShouldReturnOkResult()
         {
             // Arrange
-            var books = _fixture.CreateMany<BookDTO>();
+            var books = _fixture.Create<BookListDTO>();
             _mocker.GetMock<IMediator>()
                 .Setup(m => m.Send(It.IsAny<GetBooksQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(books);
+            var query = new GetBooksQuery();
 
             // Act
-            var result = await _controller.GetBooks();
+            var result = await _controller.GetBooks(query);
 
             // Assert
-            result.Should().BeOfType<ActionResult<IEnumerable<BookDTO>>>();
+            result.Should().BeOfType<ActionResult<BookListDTO>>();
             var okResult = result.Result as OkObjectResult;
             okResult.Value.Should().BeEquivalentTo(books);
         }

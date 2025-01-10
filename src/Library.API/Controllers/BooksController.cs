@@ -27,9 +27,8 @@ namespace Library.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BookDTO>>> GetBooks()
+        public async Task<ActionResult<BookListDTO>> GetBooks([FromQuery] GetBooksQuery query)
         {
-            var query = new GetBooksQuery();
             var result = await _mediator.Send(query);
             return Ok(result);
         }
@@ -45,7 +44,7 @@ namespace Library.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<BookDTO>> UpdateBook(int id, UpdateBookCommand command)
+        public async Task<ActionResult<BookDTO>> UpdateBook([FromQuery] int id, [FromBody] UpdateBookCommand command)
         {
             command.Id = id;
             var result = await _mediator.Send(command);
