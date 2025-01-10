@@ -1,6 +1,9 @@
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using NHibernate;
+using NHibernate.Cfg;
+using NHibernate.Dialect;
+using NHibernate.Driver;
 using NHibernate.Tool.hbm2ddl;
 using System;
 using System.Reflection;
@@ -20,13 +23,9 @@ namespace Library.Infrastructure.Data
                     try
                     {
                         _sessionFactory = Fluently.Configure()
-                            .Database(SQLiteConfiguration.Standard
-                                .ConnectionString("Data Source=Library.db;Version=3;New=True;"))
-                            .Mappings(m => m.FluentMappings
-                                .AddFromAssembly(Assembly.GetExecutingAssembly()))
-                            .ExposeConfiguration(cfg => new SchemaExport(cfg)
-                                .Create(false, true))
-                            .BuildSessionFactory();
+                              .Database(SQLiteConfiguration.Standard.ConnectionString("Data Source=Library.db;"))
+                              .Mappings(m => m.FluentMappings.AddFromAssembly(Assembly.GetExecutingAssembly()))
+                              .BuildSessionFactory();
                     }
                     catch (FluentConfigurationException ex)
                     {
