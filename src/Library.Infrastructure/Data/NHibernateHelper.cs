@@ -25,6 +25,8 @@ namespace Library.Infrastructure.Data
                         _sessionFactory = Fluently.Configure()
                               .Database(SQLiteConfiguration.Standard.ConnectionString("Data Source=Library.db;"))
                               .Mappings(m => m.FluentMappings.AddFromAssembly(Assembly.GetExecutingAssembly()))
+                              .ExposeConfiguration(cfg => new SchemaExport(cfg)
+                                      .Create(false, true))
                               .BuildSessionFactory();
                     }
                     catch (FluentConfigurationException ex)
