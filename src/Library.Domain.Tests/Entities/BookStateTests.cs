@@ -9,12 +9,12 @@ using Xunit;
 
 namespace Library.Domain.Tests.Entities
 {
-    public class BookTests
+    public class BookStateTests
     {
         private readonly Mock<IBookState> _initialStateMock;
         private readonly Book _book;
 
-        public BookTests()
+        public BookStateTests()
         {
             _book = new Book();
         }
