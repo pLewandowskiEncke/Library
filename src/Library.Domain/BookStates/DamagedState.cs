@@ -26,7 +26,7 @@ namespace Library.Domain.BookStates
 
         public IBookState PlaceOnShelf(Book book)
         {
-            throw new InvalidBookStateException("Cannot place a damaged book on the shelf.");
+            return new OnTheShelfState();
         }
     }
 }
