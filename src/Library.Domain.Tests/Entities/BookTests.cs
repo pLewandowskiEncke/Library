@@ -24,7 +24,7 @@ namespace Library.Domain.Tests.Entities
         public void PlaceOnShelf_WhenBookDamaged_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.Damage();
+            _book.MarkAsDamaged();
             _book.Status.Should().Be(BookStatus.Damaged);
 
             // Act
@@ -109,7 +109,7 @@ namespace Library.Domain.Tests.Entities
         public void Borrow_WhenBookDamaged_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.Damage();
+            _book.MarkAsDamaged();
             _book.Status.Should().Be(BookStatus.Damaged);
 
             // Act
@@ -135,22 +135,22 @@ namespace Library.Domain.Tests.Entities
         }
         #endregion
 
-        #region Damage
+        #region MarkAsDamaged
         [Fact]
-        public void Damage_WhenBookOnTheShelf_ShouldTransitionToNextState()
+        public void MarkAsDamaged_WhenBookOnTheShelf_ShouldTransitionToNextState()
         {
             // Arrange
             _book.Status.Should().Be(BookStatus.OnTheShelf);
 
             // Act
-            _book.Damage();
+            _book.MarkAsDamaged();
 
             // Assert
             _book.Status.Should().Be(BookStatus.Damaged);
         }
 
         [Fact]
-        public void Damage_WhenBookReturned_ShouldTransitionToNextState()
+        public void MarkAsDamaged_WhenBookReturned_ShouldTransitionToNextState()
         {
             // Arrange
             _book.Borrow();
@@ -158,38 +158,38 @@ namespace Library.Domain.Tests.Entities
             _book.Status.Should().Be(BookStatus.Returned);
 
             // Act
-            _book.Damage();
+            _book.MarkAsDamaged();
 
             // Assert
             _book.Status.Should().Be(BookStatus.Damaged);
         }
 
         [Fact]
-        public void Damage_WhenBookBorrowed_ShouldThrowInvalidBookStateException()
+        public void MarkAsDamaged_WhenBookBorrowed_ShouldThrowInvalidBookStateException()
         {
             // Arrange
             _book.Borrow();
             _book.Status.Should().Be(BookStatus.Borrowed);
 
             // Act
-            Action act = () => _book.Damage();
+            Action act = () => _book.MarkAsDamaged();
 
             // Assert
-            act.Should().Throw<InvalidBookStateException>().WithMessage("Cannot damage a borrowed book.");
+            act.Should().Throw<InvalidBookStateException>().WithMessage("Cannot mark as damaged a borrowed book.");
         }
 
         [Fact]
-        public void Damage_WhenBookDamaged_ShouldThrowInvalidBookStateException()
+        public void MarkAsDamaged_WhenBookDamaged_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.Damage();
+            _book.MarkAsDamaged();
             _book.Status.Should().Be(BookStatus.Damaged);
 
             // Act
-            Action act = () => _book.Damage();
+            Action act = () => _book.MarkAsDamaged();
 
             // Assert
-            act.Should().Throw<InvalidBookStateException>().WithMessage("The book is already damaged.");
+            act.Should().Throw<InvalidBookStateException>().WithMessage("The book is already marked as damaged.");
         }
         #endregion
 
@@ -226,7 +226,7 @@ namespace Library.Domain.Tests.Entities
         public void Return_WhenBookDamaged_ShouldThrowInvalidBookStateException()
         {
             // Arrange
-            _book.Damage();
+            _book.MarkAsDamaged();
             _book.Status.Should().Be(BookStatus.Damaged);
 
             // Act

@@ -19,7 +19,7 @@ namespace Library.Domain.BookStates
             throw new InvalidBookStateException("The book is already returned.");
         }
 
-        public IBookState Damage(Book book)
+        public IBookState MarkAsDamaged(Book book)
         {
             return new DamagedState();
         }

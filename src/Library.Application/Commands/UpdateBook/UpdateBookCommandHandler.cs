@@ -39,7 +39,7 @@ namespace Library.Application.Commands.CreateBook
                     book.Return();
                     break;
                 case BookStatus.Damaged:
-                    book.Damage();
+                    book.MarkAsDamaged();
                     break;
                 default:
                     throw new InvalidBookStateException("Invalid state");

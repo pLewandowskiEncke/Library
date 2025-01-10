@@ -115,7 +115,7 @@ namespace Library.Application.Tests.Commands.UpdateBook
                     book.Verify(b => b.Return(), Times.Once);
                     break;
                 case BookStatus.Damaged:
-                    book.Verify(b => b.Damage(), Times.Once);
+                    book.Verify(b => b.MarkAsDamaged(), Times.Once);
                     break;
             }
         }

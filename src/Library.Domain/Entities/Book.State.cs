@@ -29,9 +29,9 @@ namespace Library.Domain.Entities
             SetState(nextState);
         }
 
-        public virtual void Damage()
+        public virtual void MarkAsDamaged()
         {
-            var nextState = _currentState.Damage(this);
+            var nextState = _currentState.MarkAsDamaged(this);
             SetState(nextState);
         }
 

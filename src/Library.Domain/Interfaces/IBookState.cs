@@ -8,7 +8,7 @@ namespace Library.Domain.Interfaces
         BookStatus Status { get; }
         IBookState Borrow(Book book);
         IBookState Return(Book book);
-        IBookState Damage(Book book);
+        IBookState MarkAsDamaged(Book book);
         IBookState PlaceOnShelf(Book book);
     }
 }

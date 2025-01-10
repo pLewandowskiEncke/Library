@@ -19,7 +19,7 @@ namespace Library.Domain.BookStates
             throw new InvalidBookStateException("Cannot return a book that is on the shelf.");
         }
 
-        public IBookState Damage(Book book)
+        public IBookState MarkAsDamaged(Book book)
         {
             return new DamagedState();
         }
