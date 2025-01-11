@@ -1,16 +1,14 @@
 using AutoMapper;
-using Library.Application.Commands.PatchBook;
 using Library.Application.DTOs;
 using Library.Domain.Interfaces;
 using Library.Shared.Exceptions;
 using MediatR;
 
-namespace Library.Application.Commands.UpdateBook
+namespace Library.Application.Commands.PatchBook
 {
     public class PatchBookCommandHandler : IRequestHandler<PatchBookCommand, BookDTO>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMediator _mediator;
         private readonly IMapper _mapper;
 
         public PatchBookCommandHandler(IUnitOfWork unitOfWork, IMapper mapper)
@@ -27,21 +25,11 @@ namespace Library.Application.Commands.UpdateBook
                 throw new NotFoundException("Book not found");
             }
 
-            //_mapper.Map(request, book);
+            _mapper.Map(request, book);
 
-            if (!string.IsNullOrEmpty(request.Title))
+            if (request.Status.HasValue)
             {
-                book.Title = request.Title;
-            }
-
-            if (!string.IsNullOrEmpty(request.Author))
-            {
-                book.Author = request.Author;
-            }
-
-            if (!string.IsNullOrEmpty(request.ISBN))
-            {
-                book.ISBN = request.ISBN;
+                book.TryChangeStatus(request.Status.Value);
             }
 
             _unitOfWork.BeginTransaction();
