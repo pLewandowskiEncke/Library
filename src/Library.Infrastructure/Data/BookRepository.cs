@@ -56,5 +56,15 @@ namespace Library.Infrastructure.Data
 
             return await criteria.ListAsync<Book>();
         }
+
+        public async Task<bool> IsISBNUniqueAsync(string ISBN)
+        {
+            var result = await _session.QueryOver<Book>()
+                .Where(b => b.ISBN == ISBN)
+                .Select(Projections.RowCount())
+                .SingleOrDefaultAsync<int>();
+
+            return result == 0;
+        }
     }
 }

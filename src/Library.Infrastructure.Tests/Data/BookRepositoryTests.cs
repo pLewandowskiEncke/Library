@@ -5,6 +5,7 @@ using Library.Infrastructure.Data;
 using Moq;
 using NHibernate;
 using NHibernate.Criterion;
+using System.Linq.Expressions;
 using Xunit;
 
 namespace Library.Infrastructure.Tests.Data
@@ -103,6 +104,42 @@ namespace Library.Infrastructure.Tests.Data
             criteriaMock.Verify(c => c.AddOrder(It.Is<Order>(o => o.ToString() == $"{sortBy} {(ascending ? "asc" : "desc")}")), Times.Once);
             criteriaMock.Verify(c => c.SetFirstResult((pageNumber - 1) * pageSize), Times.Once);
             criteriaMock.Verify(c => c.SetMaxResults(pageSize), Times.Once);
+        }
+
+        [Fact]
+        public async Task IsISBNUniqueAsync_ShouldReturnTrue_WhenISBNIsUnique()
+        {
+            // Arrange
+            var title = "Unique Title";
+            _sessionMock.Setup(s => s.QueryOver<Book>())
+                        .Returns(Mock.Of<IQueryOver<Book, Book>>(q =>
+                            q.Where(It.IsAny<Expression<Func<Book, bool>>>()) == q &&
+                            q.Select(It.IsAny<IProjection>()) == q &&
+                            q.SingleOrDefaultAsync<int>(It.IsAny<CancellationToken>()) == Task.FromResult(0)));
+
+            // Act
+            var result = await _bookRepository.IsISBNUniqueAsync(title);
+
+            // Assert
+            result.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task IsISBNUniqueAsync_ShouldReturnFalse_WhenISBNIsNotUnique()
+        {
+            // Arrange
+            var title = "Non-Unique Title";
+            _sessionMock.Setup(s => s.QueryOver<Book>())
+                        .Returns(Mock.Of<IQueryOver<Book, Book>>(q =>
+                            q.Where(It.IsAny<Expression<Func<Book, bool>>>()) == q &&
+                            q.Select(It.IsAny<IProjection>()) == q &&
+                            q.SingleOrDefaultAsync<int>(It.IsAny<CancellationToken>()) == Task.FromResult(1)));
+
+            // Act
+            var result = await _bookRepository.IsISBNUniqueAsync(title);
+
+            // Assert
+            result.Should().BeFalse();
         }
     }
 }

@@ -9,5 +9,6 @@ namespace Library.Domain.Interfaces
         Task UpdateAsync(Book book);
         Task DeleteAsync(Book book);
         Task<IEnumerable<Book>> GetBooks(int pageNumber, int pageSize, string sortBy, bool ascending);
+        Task<bool> IsISBNUniqueAsync(string ISBN);
     }
 }
