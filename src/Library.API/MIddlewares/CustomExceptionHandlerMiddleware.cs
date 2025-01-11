@@ -27,7 +27,6 @@ namespace Library.API.Middlewares
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            context.Response.ContentType = "application/problem+json";
             int statusCode;
             string title;
 
@@ -54,7 +53,7 @@ namespace Library.API.Middlewares
                 Title = title,
                 Detail = exception.Message
             };
-            return context.Response.WriteAsync(JsonConvert.SerializeObject(problem));
+            return context.Response.WriteAsJsonAsync(problem);
         }
     }
 }

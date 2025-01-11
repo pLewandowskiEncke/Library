@@ -15,7 +15,7 @@ namespace Library.API.Tests.Middlewares
         private readonly AutoMocker _autoMocker;
         private readonly Mock<RequestDelegate> _nextMock;
         private readonly CustomExceptionHandlerMiddleware _middleware;
-        const string ContentType = "application/problem+json";
+        const string ContentType = "application/json; charset=utf-8";
 
         public CustomExceptionHandlerMiddlewareTests()
         {

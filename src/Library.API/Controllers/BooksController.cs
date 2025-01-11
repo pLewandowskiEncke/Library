@@ -10,6 +10,7 @@ namespace Library.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public class BooksController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -20,6 +21,9 @@ namespace Library.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(BookDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<BookDTO>> GetBookById(int id)
         {
             var query = new GetBookByIdQuery(id);
@@ -28,6 +32,8 @@ namespace Library.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(BookListDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<BookListDTO>> GetBooks([FromQuery] GetBooksQuery query)
         {
             var result = await _mediator.Send(query);
@@ -35,7 +41,9 @@ namespace Library.Controllers
         }
 
         [HttpPost]
-        [ProducesResponseType(201)]
+        [ProducesResponseType(typeof(BookDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<BookDTO>> CreateBook(CreateBookCommand command)
         {
             var result = await _mediator.Send(command);
@@ -46,6 +54,10 @@ namespace Library.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(BookDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<BookDTO>> UpdateBook(int id, [FromBody] UpdateBookCommand command)
         {
             command.Id = id;
@@ -54,7 +66,9 @@ namespace Library.Controllers
         }
 
         [HttpDelete("{id}")]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteBook(int id)
         {
             var command = new DeleteBookCommand { Id = id };
