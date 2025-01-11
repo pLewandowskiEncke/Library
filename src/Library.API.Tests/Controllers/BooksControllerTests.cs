@@ -39,7 +39,7 @@ namespace Library.API.Tests.Controllers
         }
 
         [Fact]
-        public async Task CreateBook_ShouldReturnsCreatedResult()
+        public async Task CreateBook_ShouldReturnsCreatedResult_WithCreatedBook()
         {
             // Arrange            
             var command = _fixture.Create<CreateBookCommand>();
@@ -59,9 +59,30 @@ namespace Library.API.Tests.Controllers
 
             // Assert
             result.Should().BeOfType<ActionResult<BookDTO>>();
-            var createdResult = result.Result as CreatedResult;
-            createdResult.Value.Should().Be(bookDto);
-            createdResult.Location.Should().Contain($"foo");
+            var returnedResult = result.Result as CreatedResult;
+            returnedResult.Value.Should().Be(bookDto);
+            returnedResult.Location.Should().Contain($"foo");
+        }
+
+        [Fact]
+        public async Task UpdateBook_ShouldReturnOkResult_WithUpdatedBook()
+        {
+            // Arrange
+            var bookId = 1;
+            var updateBookCommand = new UpdateBookCommand { Id = bookId, Title = "Updated Title" };
+            var updatedBook = new BookDTO { Id = bookId, Title = "Updated Title" };
+
+            _mocker.GetMock<IMediator>()
+                .Setup(m => m.Send(It.Is<UpdateBookCommand>(x => x.Id == bookId && x.Title == "Updated Title"), default))
+                .ReturnsAsync(updatedBook);
+
+            // Act
+            var result = await _controller.UpdateBook(bookId, updateBookCommand);
+
+            // Assert
+            result.Should().BeOfType<ActionResult<BookDTO>>();
+            var returnedResult = result.Result as OkObjectResult;
+            returnedResult.Value.Should().Be(updatedBook);
         }
 
         [Fact]

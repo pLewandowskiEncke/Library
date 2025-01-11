@@ -44,7 +44,7 @@ namespace Library.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<BookDTO>> UpdateBook([FromQuery] int id, [FromBody] UpdateBookCommand command)
+        public async Task<ActionResult<BookDTO>> UpdateBook(int id, [FromBody] UpdateBookCommand command)
         {
             command.Id = id;
             var result = await _mediator.Send(command);
