@@ -1,6 +1,7 @@
 using AutoFixture;
 using FluentAssertions;
 using Library.Application.Commands.CreateBook;
+using Library.Application.Commands.DeleteBook;
 using Library.Application.DTOs;
 using Library.Application.Queries.GetBookById;
 using Library.Application.Queries.GetBooks;
@@ -62,6 +63,24 @@ namespace Library.API.Tests.Controllers
             var returnedResult = result.Result as CreatedResult;
             returnedResult.Value.Should().Be(bookDto);
             returnedResult.Location.Should().Contain($"foo");
+        }
+
+        [Fact]
+        public async Task DeleteBook_ShouldReturnNoContentResult()
+        {
+            // Arrange            
+            var bookId = 1;
+            var command = _fixture.Create<DeleteBookCommand>();
+            var bookDto = _fixture.Build<BookDTO>().With(x => x.Id, 1).Create();
+            _mocker.GetMock<IMediator>()
+                .Setup(m => m.Send(It.Is<DeleteBookCommand>(x => x.Id == bookId), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Value);
+
+            // Act
+            var result = await _controller.DeleteBook(bookId);
+
+            // Assert
+            result.Should().BeOfType<NoContentResult>();
         }
 
         [Fact]

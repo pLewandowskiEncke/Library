@@ -1,4 +1,5 @@
 using Library.Application.Commands.CreateBook;
+using Library.Application.Commands.DeleteBook;
 using Library.Application.DTOs;
 using Library.Application.Queries.GetBookById;
 using Library.Application.Queries.GetBooks;
@@ -34,6 +35,7 @@ namespace Library.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(201)]
         public async Task<ActionResult<BookDTO>> CreateBook(CreateBookCommand command)
         {
             var result = await _mediator.Send(command);
@@ -49,6 +51,15 @@ namespace Library.Controllers
             command.Id = id;
             var result = await _mediator.Send(command);
             return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(204)]
+        public async Task<IActionResult> DeleteBook(int id)
+        {
+            var command = new DeleteBookCommand { Id = id };
+            await _mediator.Send(command);
+            return NoContent();
         }
     }
 }

@@ -58,8 +58,6 @@ namespace Library.Application.Tests.Commands.UpdateBook
                 .WithMessage("Invalid state");
         }
 
-        // ...
-
         [Fact]
         public async Task Handle_ShouldUpdateBookState_WhenValidState()
         {
