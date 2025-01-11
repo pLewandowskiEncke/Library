@@ -1,3 +1,4 @@
+using Library.API.MIddlewares;
 using Library.Application.Commands.CreateBook;
 using Library.Application.Mappings;
 using Library.Infrastructure;
@@ -11,6 +12,7 @@ builder.Services.AddControllers()
         options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
         options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
     });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -20,7 +22,7 @@ builder.Services.AddAutoMapper(typeof(AutomapperBookProfile));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -28,6 +30,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<CustomExceptionHandlerMiddleware>();
 
 app.UseAuthorization();
 
