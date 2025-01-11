@@ -26,7 +26,6 @@ namespace Library.Application.Commands.CreateBook
             {
                 throw new NotFoundException("Book not found");
             }
-            _unitOfWork.BeginTransaction();
             switch (request.Status)
             {
                 case BookStatus.OnTheShelf:
@@ -44,7 +43,8 @@ namespace Library.Application.Commands.CreateBook
                 default:
                     throw new InvalidBookStateException("Invalid state");
             }
-
+            _mapper.Map(request, book);
+            _unitOfWork.BeginTransaction();
             await _unitOfWork.BookRepository.UpdateAsync(book);
             _unitOfWork.Commit();
             return _mapper.Map<BookDTO>(book);

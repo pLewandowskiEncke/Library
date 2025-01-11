@@ -1,5 +1,6 @@
 using Library.Application.Commands.CreateBook;
 using Library.Application.Commands.DeleteBook;
+using Library.Application.Commands.PatchBook;
 using Library.Application.DTOs;
 using Library.Application.Queries.GetBookById;
 using Library.Application.Queries.GetBooks;
@@ -59,6 +60,18 @@ namespace Library.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<BookDTO>> UpdateBook(int id, [FromBody] UpdateBookCommand command)
+        {
+            command.Id = id;
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        [HttpPatch("{id}")]
+        [ProducesResponseType(typeof(BookDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<BookDTO>> PatchBook(int id, [FromBody] PatchBookCommand command)
         {
             command.Id = id;
             var result = await _mediator.Send(command);
