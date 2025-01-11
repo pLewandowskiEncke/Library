@@ -1,6 +1,7 @@
 using Library.Application.Commands.CreateBook;
 using Library.Application.Commands.DeleteBook;
 using Library.Application.Commands.PatchBook;
+using Library.Application.Commands.UpdateBook;
 using Library.Application.DTOs;
 using Library.Application.Queries.GetBookById;
 using Library.Application.Queries.GetBooks;

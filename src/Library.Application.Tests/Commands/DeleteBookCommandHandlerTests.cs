@@ -8,7 +8,7 @@ using Moq;
 using Moq.AutoMock;
 using Xunit;
 
-namespace Library.Application.Tests.Commands.DeleteBook
+namespace Library.Application.Tests.Commands
 {
     public class DeleteBookCommandHandlerTests
     {
@@ -65,7 +65,7 @@ namespace Library.Application.Tests.Commands.DeleteBook
             // Assert
             await act.Should().ThrowAsync<NotFoundException>()
                 .WithMessage("Book not found");
-         
+
             _unitOfWork.Verify(u => u.BookRepository.GetByIdAsync(bookId), Times.Once);
             _unitOfWork.Verify(u => u.BookRepository.DeleteAsync(It.IsAny<Book>()), Times.Never);
             _unitOfWork.Verify(u => u.BeginTransaction(), Times.Never);

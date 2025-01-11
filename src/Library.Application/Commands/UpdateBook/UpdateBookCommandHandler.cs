@@ -1,4 +1,5 @@
 using AutoMapper;
+using Library.Application.Commands.UpdateBook;
 using Library.Application.DTOs;
 using Library.Domain.Entities;
 using Library.Domain.Enums;
@@ -26,23 +27,7 @@ namespace Library.Application.Commands.CreateBook
             {
                 throw new NotFoundException("Book not found");
             }
-            switch (request.Status)
-            {
-                case BookStatus.OnTheShelf:
-                    book.PlaceOnShelf();
-                    break;
-                case BookStatus.Borrowed:
-                    book.Borrow();
-                    break;
-                case BookStatus.Returned:
-                    book.Return();
-                    break;
-                case BookStatus.Damaged:
-                    book.MarkAsDamaged();
-                    break;
-                default:
-                    throw new InvalidBookStateException("Invalid state");
-            }
+            book.TryChangeStatus(request.Status);
             _mapper.Map(request, book);
             _unitOfWork.BeginTransaction();
             await _unitOfWork.BookRepository.UpdateAsync(book);

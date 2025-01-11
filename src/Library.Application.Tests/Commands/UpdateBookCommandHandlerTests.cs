@@ -1,6 +1,7 @@
 using AutoMapper;
 using FluentAssertions;
 using Library.Application.Commands.CreateBook;
+using Library.Application.Commands.UpdateBook;
 using Library.Application.DTOs;
 using Library.Domain.Entities;
 using Library.Domain.Enums;
@@ -10,7 +11,7 @@ using Moq;
 using Moq.AutoMock;
 using Xunit;
 
-namespace Library.Application.Tests.Commands.UpdateBook
+namespace Library.Application.Tests.Commands
 {
     public class UpdateBookCommandHandlerTests
     {
@@ -44,7 +45,7 @@ namespace Library.Application.Tests.Commands.UpdateBook
         public async Task Handle_ShouldThrowInvalidBookStateException_WhenInvalidState()
         {
             // Arrange
-            var book = new CustomBook(BookStatus.Borrowed) { Id = 1 };
+            var book = new Book { Id = 1 };
             var command = new UpdateBookCommand { Id = 1, Status = (BookStatus)999 };
             _mocker.GetMock<IUnitOfWork>()
                 .Setup(u => u.BookRepository.GetByIdAsync(It.IsAny<int>()))
@@ -59,11 +60,11 @@ namespace Library.Application.Tests.Commands.UpdateBook
         }
 
         [Fact]
-        public async Task Handle_ShouldUpdateBookState_WhenValidState()
+        public async Task Handle_ShouldUpdateBook_WhenBookFound()
         {
             // Arrange
-            var book = new CustomBook(BookStatus.Borrowed) { Id = 1 };
-            var command = new UpdateBookCommand { Id = 1, Status = BookStatus.Returned };
+            var book = new Book { Id = 1, Title = "foo" };
+            var command = new UpdateBookCommand { Id = 1, Status = BookStatus.Borrowed, Title = "bar" };
             _mocker.GetMock<IUnitOfWork>()
                 .Setup(u => u.BookRepository.GetByIdAsync(It.IsAny<int>()))
                 .ReturnsAsync(book);
@@ -71,6 +72,12 @@ namespace Library.Application.Tests.Commands.UpdateBook
             _mocker.GetMock<IMapper>()
                 .Setup(m => m.Map<BookDTO>(book))
                 .Returns(expected);
+            _mocker.GetMock<IMapper>()
+                .Setup(m => m.Map(It.IsAny<UpdateBookCommand>(), It.IsAny<Book>()))
+                .Callback<UpdateBookCommand, Book>((cmd, b) =>
+                {
+                    b.Title = cmd.Title;
+                });
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
@@ -79,20 +86,18 @@ namespace Library.Application.Tests.Commands.UpdateBook
             _mocker.GetMock<IUnitOfWork>().Verify(u => u.BeginTransaction(), Times.Once);
             _mocker.GetMock<IUnitOfWork>().Verify(u => u.BookRepository.UpdateAsync(It.Is<Book>(
                 book => book.Id == 1 &&
-                book.Status == BookStatus.Returned
+                book.Status == BookStatus.Borrowed &&
+                book.Title == "bar"
                 )), Times.Once);
             _mocker.GetMock<IUnitOfWork>().Verify(u => u.Commit(), Times.Once);
             result.Should().BeEquivalentTo(expected);
         }
 
-        [Theory]
-        [InlineData(BookStatus.OnTheShelf)]
-        [InlineData(BookStatus.Borrowed)]
-        [InlineData(BookStatus.Returned)]
-        [InlineData(BookStatus.Damaged)]
-        public async Task Handle_ShouldCallCorrectStateMethod_WhenValidState(BookStatus status)
+        [Fact]
+        public async Task Handle_ShouldCallTryChangeStatus_WhenBookFound()
         {
             // Arrange
+            var status = BookStatus.Borrowed;
             var book = new Mock<Book>();
             var command = new UpdateBookCommand { Id = 1, Status = status };
             _mocker.GetMock<IUnitOfWork>().
@@ -106,29 +111,7 @@ namespace Library.Application.Tests.Commands.UpdateBook
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
-            switch (status)
-            {
-                case BookStatus.OnTheShelf:
-                    book.Verify(b => b.PlaceOnShelf(), Times.Once);
-                    break;
-                case BookStatus.Borrowed:
-                    book.Verify(b => b.Borrow(), Times.Once);
-                    break;
-                case BookStatus.Returned:
-                    book.Verify(b => b.Return(), Times.Once);
-                    break;
-                case BookStatus.Damaged:
-                    book.Verify(b => b.MarkAsDamaged(), Times.Once);
-                    break;
-            }
-        }
-    }
-
-    internal class CustomBook : Book
-    {
-        public CustomBook(BookStatus status)
-        {
-            Status = status;
+            book.Verify(b => b.TryChangeStatus(status), Times.Once);
         }
     }
 }

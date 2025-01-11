@@ -4,7 +4,7 @@ using MediatR;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
-namespace Library.Application.Commands.CreateBook
+namespace Library.Application.Commands.UpdateBook
 {
     public class UpdateBookCommand : IRequest<BookDTO>
     {

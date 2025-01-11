@@ -231,6 +231,74 @@ namespace Library.Domain.Tests.Entities
             act.Should().Throw<InvalidBookStateException>().WithMessage("The book is already returned.");
         }
         #endregion
+
+        #region TryChangeStatus
+        [Fact]
+        public void TryChangeStatus_ToOnTheShelf_ChangesStatus()
+        {
+            // Arrange
+            var book = new CustomBook(BookStatus.Returned);
+
+            // Act
+            book.TryChangeStatus(BookStatus.OnTheShelf);
+
+            // Assert
+            book.Status.Should().Be(BookStatus.OnTheShelf);
+        }
+
+        [Fact]
+        public void TryChangeStatus_ToBorrowed_ChangesStatus()
+        {
+            // Arrange
+            var book = new CustomBook(BookStatus.OnTheShelf);
+
+            // Act
+            book.TryChangeStatus(BookStatus.Borrowed);
+
+            // Assert
+            book.Status.Should().Be(BookStatus.Borrowed);
+        }
+
+        [Fact]
+        public void TryChangeStatus_ToReturned_ChangesStatus()
+        {
+            // Arrange
+            var book = new CustomBook(BookStatus.Borrowed);
+
+            // Act
+            book.TryChangeStatus(BookStatus.Returned);
+
+            // Assert
+            book.Status.Should().Be(BookStatus.Returned);
+        }
+
+        [Fact]
+        public void TryChangeStatus_ToDamaged_ChangesStatus()
+        {
+            // Arrange
+            var book = new CustomBook(BookStatus.OnTheShelf);
+
+            // Act
+            book.TryChangeStatus(BookStatus.Damaged);
+
+            // Assert
+            book.Status.Should().Be(BookStatus.Damaged);
+        }
+
+        [Fact]
+        public void TryChangeStatus_InvalidStatus_ThrowsInvalidBookStateException()
+        {
+            // Arrange
+            var book = new CustomBook(BookStatus.OnTheShelf);
+
+            // Act
+            Action act = () => book.TryChangeStatus((BookStatus)999);
+
+            // Assert
+            act.Should().Throw<InvalidBookStateException>()
+               .WithMessage("Invalid state");
+        }
+        #endregion
     }
 
     internal class CustomBook : Book
