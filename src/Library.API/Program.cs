@@ -1,4 +1,4 @@
-using Library.API.MIddlewares;
+using Library.API.Middlewares;
 using Library.Application.Commands.CreateBook;
 using Library.Application.Mappings;
 using Library.Infrastructure;
