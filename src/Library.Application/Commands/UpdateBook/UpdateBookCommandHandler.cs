@@ -6,6 +6,7 @@ using Library.Domain.Enums;
 using Library.Domain.Interfaces;
 using Library.Shared.Exceptions;
 using MediatR;
+using System.ComponentModel.DataAnnotations;
 
 namespace Library.Application.Commands.CreateBook
 {
@@ -27,8 +28,11 @@ namespace Library.Application.Commands.CreateBook
             {
                 throw new NotFoundException("Book not found");
             }
-            book.TryChangeStatus(request.Status);
             _mapper.Map(request, book);
+            if (request.Status.HasValue)
+            {
+                book.TryChangeStatus(request.Status.Value);
+            }
             _unitOfWork.BeginTransaction();
             await _unitOfWork.BookRepository.UpdateAsync(book);
             _unitOfWork.Commit();

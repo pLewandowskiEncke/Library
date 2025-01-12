@@ -3,6 +3,7 @@ using Library.Application.DTOs;
 using Library.Domain.Entities;
 using Library.Domain.Interfaces;
 using MediatR;
+using System.ComponentModel.DataAnnotations;
 
 namespace Library.Application.Commands.CreateBook
 {
@@ -19,7 +20,7 @@ namespace Library.Application.Commands.CreateBook
 
         public async Task<BookDTO> Handle(CreateBookCommand request, CancellationToken cancellationToken)
         {
-            _unitOfWork.BeginTransaction();
+            _unitOfWork.BeginTransaction();            
             var book = _mapper.Map<Book>(request);
             await _unitOfWork.BookRepository.AddAsync(book);
             _unitOfWork.Commit();

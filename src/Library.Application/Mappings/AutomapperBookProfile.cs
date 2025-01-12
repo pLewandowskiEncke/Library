@@ -22,6 +22,7 @@ namespace Library.Application.Mappings
             CreateMap<PatchBookCommand, Book>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
+                // Update only properties which value is not null.
                 .ForAllMembers(opt => opt.Condition((src, dest, scrMember) => scrMember != null)); 
 
             CreateMap<Book, BookDTO>();

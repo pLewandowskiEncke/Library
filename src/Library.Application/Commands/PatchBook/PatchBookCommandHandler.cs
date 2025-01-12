@@ -24,9 +24,7 @@ namespace Library.Application.Commands.PatchBook
             {
                 throw new NotFoundException("Book not found");
             }
-
             _mapper.Map(request, book);
-
             if (request.Status.HasValue)
             {
                 book.TryChangeStatus(request.Status.Value);

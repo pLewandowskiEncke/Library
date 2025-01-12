@@ -2,7 +2,6 @@ using Library.Application.DTOs;
 using Library.Domain.Enums;
 using MediatR;
 using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
 
 namespace Library.Application.Commands.UpdateBook
 {
@@ -10,13 +9,9 @@ namespace Library.Application.Commands.UpdateBook
     {
         [JsonIgnore]
         public int Id { get; set; }
-        [Required]
-        public string Title { get; set; }
-        [Required]
-        public string Author { get; set; }
-        [Required]
-        public string ISBN { get; set; }
-        [Required]
-        public BookStatus Status { get; set; }
+        public string? Title { get; set; }
+        public string? Author { get; set; }
+        public string? ISBN { get; set; }
+        public BookStatus? Status { get; set; }
     }
 }

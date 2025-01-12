@@ -1,6 +1,8 @@
+using FluentValidation;
 using Library.API.Middlewares;
 using Library.Application.Commands.CreateBook;
 using Library.Application.Mappings;
+using Library.Application.Validators;
 using Library.Infrastructure;
 using Newtonsoft.Json.Converters;
 
@@ -20,8 +22,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen().AddSwaggerGenNewtonsoftSupport();
 
 builder.Services.AddInfrastructure();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateBookCommandValidator>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateBookCommand).Assembly));
 builder.Services.AddAutoMapper(typeof(AutomapperBookProfile));
+
 
 var app = builder.Build();
 
