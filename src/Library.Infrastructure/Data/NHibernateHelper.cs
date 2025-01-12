@@ -20,7 +20,7 @@ namespace Library.Infrastructure.Data
                             .Database(SQLiteConfiguration.Standard.ConnectionString("Data Source=Library.db;"))
                             .Mappings(m => m.FluentMappings.AddFromAssembly(Assembly.GetExecutingAssembly()))
                             // Uncomment the line below to create the database schema
-                            //.ExposeConfiguration(cfg => new SchemaExport(cfg).Create(false, true))
+                            .ExposeConfiguration(cfg => new SchemaExport(cfg).Create(false, true))
                             .BuildSessionFactory();
 
                 }

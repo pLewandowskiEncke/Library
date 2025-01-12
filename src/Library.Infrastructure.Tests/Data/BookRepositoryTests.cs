@@ -1,144 +1,180 @@
 
 using FluentAssertions;
+using FluentNHibernate.Cfg;
+using FluentNHibernate.Cfg.Db;
 using Library.Domain.Entities;
 using Library.Infrastructure.Data;
-using Moq;
+using Library.Infrastructure.Data.Mappings;
 using NHibernate;
-using NHibernate.Criterion;
-using System.Linq.Expressions;
+using NHibernate.Cfg;
+using NHibernate.Tool.hbm2ddl;
 using Xunit;
 
 namespace Library.Infrastructure.Tests.Data
 {
     public class BookRepositoryTests
     {
-        private readonly Mock<ISession> _sessionMock;
+        private readonly ISession _session;
         private readonly BookRepository _bookRepository;
 
         public BookRepositoryTests()
         {
-            _sessionMock = new Mock<ISession>();
-            _bookRepository = new BookRepository(_sessionMock.Object);
+            _session = CreateSession();
+            _bookRepository = new BookRepository(_session);
         }
 
-        [Fact]
-        public async Task GetByIdAsync_ShouldReturnBook_WhenBookExists()
+        private static ISession CreateSession()
         {
-            // Arrange
-            var bookId = 1;
-            var expectedBook = new Book { Id = bookId };
-            _sessionMock.Setup(s => s.GetAsync<Book>(bookId, It.IsAny<CancellationToken>())).ReturnsAsync(expectedBook);
+            Configuration configuration = null;
 
-            // Act
-            var result = await _bookRepository.GetByIdAsync(bookId);
+            // Manually configuring Map. NHibernate supports conventions and advanced features as well
+            var factory = Fluently.Configure()
+                           .Mappings(x => x.FluentMappings.Add(typeof(BookMap)))
+                           .Database(SQLiteConfiguration.Standard.InMemory().ShowSql())
+                           .ExposeConfiguration(cfg => configuration = cfg)
+                           .BuildSessionFactory();
 
-            // Assert
-            result.Should().Be(expectedBook);
+            var session = factory.OpenSession();
+
+            new SchemaExport(configuration).Execute(true, true, false, session.Connection, null);
+
+            return session;
         }
 
         [Fact]
         public async Task AddAsync_ShouldAddBook()
         {
             // Arrange
-            var book = new Book { Id = 1 };
-            _sessionMock.Setup(s => s.SaveAsync(book, It.IsAny<CancellationToken>())).Returns(Task.FromResult<object>(null));
+            var book = new Book { Title = "Test Book", Author = "Test Author", ISBN = "1234567890" };
 
             // Act
             await _bookRepository.AddAsync(book);
+            _session.Flush();
+            _session.Clear();
 
             // Assert
-            _sessionMock.Verify(s => s.SaveAsync(book, It.IsAny<CancellationToken>()), Times.Once);
+            var retrievedBook = await _bookRepository.GetByIdAsync(book.Id);
+            retrievedBook.Should().NotBeNull();
+            retrievedBook.Title.Should().Be("Test Book");
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_ShouldReturnBook_WhenBookExists()
+        {
+            // Arrange
+            var book = new Book { Title = "Test Book", Author = "Test Author", ISBN = "1234567890" };
+            await _bookRepository.AddAsync(book);
+            _session.Flush();
+            _session.Clear();
+
+            // Act
+            var retrievedBook = await _bookRepository.GetByIdAsync(book.Id);
+
+            // Assert
+            retrievedBook.Should().NotBeNull();
+            retrievedBook.Title.Should().Be("Test Book");
         }
 
         [Fact]
         public async Task UpdateAsync_ShouldUpdateBook()
         {
             // Arrange
-            var book = new Book { Id = 1 };
-            _sessionMock.Setup(s => s.UpdateAsync(book, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            var book = new Book { Title = "Test Book", Author = "Test Author", ISBN = "1234567890" };
+            await _bookRepository.AddAsync(book);
+            _session.Flush();
+            _session.Clear();
 
             // Act
+            book.Title = "Updated Test Book";
             await _bookRepository.UpdateAsync(book);
+            _session.Flush();
+            _session.Clear();
 
             // Assert
-            _sessionMock.Verify(s => s.UpdateAsync(book, It.IsAny<CancellationToken>()), Times.Once);
+            var retrievedBook = await _bookRepository.GetByIdAsync(book.Id);
+            retrievedBook.Title.Should().Be("Updated Test Book");
         }
 
         [Fact]
-        public async Task DeleteAsync_ShouldDeleteBook()
+        public async Task DeleteAsync_ShouldRemoveBook()
         {
             // Arrange
-            var book = new Book { Id = 1 };
-            _sessionMock.Setup(s => s.DeleteAsync(book, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+            var book = new Book { Title = "Test Book", Author = "Test Author", ISBN = "1234567890" };
+            await _bookRepository.AddAsync(book);
+            _session.Flush();
+            _session.Clear();
 
             // Act
             await _bookRepository.DeleteAsync(book);
+            _session.Flush();
+            _session.Clear();
 
             // Assert
-            _sessionMock.Verify(s => s.DeleteAsync(book, It.IsAny<CancellationToken>()), Times.Once);
+            var retrievedBook = await _bookRepository.GetByIdAsync(book.Id);
+            retrievedBook.Should().BeNull();
         }
 
         [Fact]
-        public async Task GetBooks_ShouldReturnPagedAndSortedBooks()
+        public async Task GetBooks_ShouldReturnPagedBooks()
         {
             // Arrange
-            var pageNumber = 1;
-            var pageSize = 10;
-            var sortBy = "Title";
-            var ascending = true;
-            var expectedBooks = new List<Book> { new Book { Id = 1 }, new Book { Id = 2 } };
-
-            var criteriaMock = new Mock<ICriteria>();
-            criteriaMock.Setup(c => c.AddOrder(It.IsAny<Order>())).Returns(criteriaMock.Object);
-            criteriaMock.Setup(c => c.SetFirstResult(It.IsAny<int>())).Returns(criteriaMock.Object);
-            criteriaMock.Setup(c => c.SetMaxResults(It.IsAny<int>())).Returns(criteriaMock.Object);
-            criteriaMock.Setup(c => c.ListAsync<Book>(It.IsAny<CancellationToken>())).ReturnsAsync(expectedBooks);
-
-            _sessionMock.Setup(s => s.CreateCriteria<Book>()).Returns(criteriaMock.Object);
+            for (int i = 1; i <= 9; i++)
+            {
+                var book = new Book { Title = $"Test Book {i}", Author = "Test Author", ISBN = $"123456789{i}" };
+                await _bookRepository.AddAsync(book);
+            }
+            _session.Flush();
+            _session.Clear();
 
             // Act
-            var result = await _bookRepository.GetBooks(pageNumber, pageSize, sortBy, ascending);
+            var books = await _bookRepository.GetBooks(1, 5, "Title", true);
 
             // Assert
-            result.Should().BeEquivalentTo(expectedBooks);
-            criteriaMock.Verify(c => c.AddOrder(It.Is<Order>(o => o.ToString() == $"{sortBy} {(ascending ? "asc" : "desc")}")), Times.Once);
-            criteriaMock.Verify(c => c.SetFirstResult((pageNumber - 1) * pageSize), Times.Once);
-            criteriaMock.Verify(c => c.SetMaxResults(pageSize), Times.Once);
+            books.Should().HaveCount(5);
+            books.Should().Contain(b => b.Title == "Test Book 1");
+            books.Should().Contain(b => b.Title == "Test Book 5");
         }
 
         [Fact]
-        public async Task IsISBNUniqueAsync_ShouldReturnTrue_WhenISBNIsUnique()
+        public async Task IsISBNUniqueAsync_ShouldReturnTrue_WhenNoBooksWithTheSameISBN()
         {
             // Arrange
-            var ISBN = "Unique Title";
-            var bookId = 1;
-            _sessionMock.Setup(s => s.QueryOver<Book>())
-                        .Returns(Mock.Of<IQueryOver<Book, Book>>(q =>
-                            q.Where(It.IsAny<Expression<Func<Book, bool>>>()) == q &&
-                            q.Select(It.IsAny<IProjection>()) == q &&
-                            q.SingleOrDefaultAsync<int>(It.IsAny<CancellationToken>()) == Task.FromResult(0)));
+            var isbn = "1234567890";
 
             // Act
-            var result = await _bookRepository.IsISBNUniqueAsync(ISBN, bookId);
+            var result = await _bookRepository.IsISBNUniqueAsync(isbn, null);
 
             // Assert
             result.Should().BeTrue();
         }
 
         [Fact]
-        public async Task IsISBNUniqueAsync_ShouldReturnFalse_WhenISBNIsNotUnique()
+        public async Task IsISBNUniqueAsync_ShouldReturnTrue_WhenBookWithSameIdHasSameISBN()
         {
             // Arrange
-            var ISBN = "Non-Unique Title";
-            var bookId = 1;
-            _sessionMock.Setup(s => s.QueryOver<Book>())
-                        .Returns(Mock.Of<IQueryOver<Book, Book>>(q =>
-                            q.Where(It.IsAny<Expression<Func<Book, bool>>>()) == q &&
-                            q.Select(It.IsAny<IProjection>()) == q &&
-                            q.SingleOrDefaultAsync<int>(It.IsAny<CancellationToken>()) == Task.FromResult(1)));
+            var book = new Book { Title = "Test Book 1", Author = "Test Author", ISBN = "1234567890" };
+            await _bookRepository.AddAsync(book);
+            _session.Flush();
+            _session.Clear();
 
             // Act
-            var result = await _bookRepository.IsISBNUniqueAsync(ISBN, bookId);
+            var result = await _bookRepository.IsISBNUniqueAsync(book.ISBN, book.Id);
+
+            // Assert
+            result.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task IsISBNUniqueAsync_ShouldReturnFalse_WhenAnotherBookExistsWithSameISBN()
+        {
+            // Arrange
+            var book = new Book { Title = "Test Book", Author = "Test Author", ISBN = "1234567890" };
+            await _bookRepository.AddAsync(book);
+            _session.Flush();
+            _session.Clear();
+
+            // Act
+            var result = await _bookRepository.IsISBNUniqueAsync(book.ISBN, 99);
 
             // Assert
             result.Should().BeFalse();
