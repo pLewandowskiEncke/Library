@@ -3,10 +3,7 @@ using MediatR;
 
 namespace Library.Application.Commands.CreateBook
 {
-    public class CreateBookCommand : IRequest<BookDTO>
+    public class CreateBookCommand : BaseBookCommand, IRequest<BookDTO>
     {
-        public string? Title { get; set; }
-        public string? Author { get; set; }
-        public string? ISBN { get; set; }
     }
 }

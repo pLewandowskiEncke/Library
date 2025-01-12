@@ -6,22 +6,13 @@ namespace Library.Application.Validators
 {
     public class CreateBookCommandValidator : AbstractValidator<CreateBookCommand>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
         public CreateBookCommandValidator(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;
-            RuleFor(command => command.Author).NotEmpty().MaximumLength(50);
-            RuleFor(command => command.Title).NotEmpty().MaximumLength(50);
-            RuleFor(command => command.ISBN)
-                .NotEmpty()
-                .MaximumLength(10)
-                .MustAsync(BeUnique).WithMessage(command => $"Book with ISBN '{command.ISBN}' already exists");
-        }
-
-        private async Task<bool> BeUnique(string ISBN, CancellationToken token)
-        {
-            return await _unitOfWork.BookRepository.IsISBNUniqueAsync(ISBN);
+            Include(new BaseBookCommandValidator(unitOfWork));
+            // Adding rulse on top of the base rules
+            RuleFor(command => command.Author).NotEmpty();
+            RuleFor(command => command.Title).NotEmpty();
+            RuleFor(command => command.ISBN).NotEmpty();
         }
     }
 }

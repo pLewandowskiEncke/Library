@@ -1,16 +1,19 @@
 ﻿using FluentValidation;
 using Library.Application.Commands.UpdateBook;
+using Library.Domain.Interfaces;
 
 namespace Library.Application.Validators
 {
     public class UpdateBookCommandValidator : AbstractValidator<UpdateBookCommand>
     {
-        public UpdateBookCommandValidator()
+        public UpdateBookCommandValidator(IUnitOfWork unitOfWork)
         {
-            RuleFor(command => command.Author).NotEmpty().MaximumLength(50);
-            RuleFor(command => command.Title).NotEmpty().MaximumLength(50); 
-            RuleFor(command => command.ISBN).NotEmpty().MaximumLength(20); 
-            RuleFor(command => command.Status).NotEmpty().IsInEnum();
+            Include(new BaseBookCommandValidator(unitOfWork));
+            // Adding rulse on top of the base rules
+            RuleFor(command => command.Author).NotEmpty();
+            RuleFor(command => command.Title).NotEmpty();
+            RuleFor(command => command.ISBN).NotEmpty();
+
         }
     }
 }
