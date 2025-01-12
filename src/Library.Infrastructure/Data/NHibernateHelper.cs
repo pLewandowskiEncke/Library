@@ -19,7 +19,8 @@ namespace Library.Infrastructure.Data
                     _sessionFactory = Fluently.Configure()
                             .Database(SQLiteConfiguration.Standard.ConnectionString("Data Source=Library.db;"))
                             .Mappings(m => m.FluentMappings.AddFromAssembly(Assembly.GetExecutingAssembly()))
-                            // Uncomment the line below to create the database schema
+                            // Uncomment the line below to create the database schema.
+                            // Comment it back after the database is created to avoid recreating it and losing data.
                             .ExposeConfiguration(cfg => new SchemaExport(cfg).Create(false, true))
                             .BuildSessionFactory();
 

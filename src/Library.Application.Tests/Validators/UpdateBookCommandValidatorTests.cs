@@ -22,7 +22,7 @@ namespace Library.Application.Tests.Validators
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public async Task ShouldHaveError_WhenTitleIsNulOrEmptyAsync(string? value)
+        public async Task ShouldHaveError_WhenTitleIsNullOrEmpty(string? value)
         {
             // Arrange
             var command = new UpdateBookCommand { Title = value };
@@ -37,7 +37,7 @@ namespace Library.Application.Tests.Validators
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public async Task ShouldHaveError_WhenAuthorIsEmptyAsync(string? value)
+        public async Task ShouldHaveError_WhenAuthorIsNullOrEmpty(string? value)
         {
             // Arrange
             var command = new UpdateBookCommand { Author = value };
@@ -52,7 +52,7 @@ namespace Library.Application.Tests.Validators
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public async Task ShouldHaveError_WhenISBNIsEmptyAsync(string? value)
+        public async Task ShouldHaveError_WhenISBNIsNullOrEmpty(string? value)
         {
             // Arrange
             var command = new UpdateBookCommand { ISBN = value };
