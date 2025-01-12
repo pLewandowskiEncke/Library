@@ -111,7 +111,7 @@ namespace Library.Infrastructure.Tests.Data
         {
             // Arrange
             var ISBN = "Unique Title";
-            var books = new List<Book> { new Book { ISBN = "123456" } };
+            var bookId = 1;
             _sessionMock.Setup(s => s.QueryOver<Book>())
                         .Returns(Mock.Of<IQueryOver<Book, Book>>(q =>
                             q.Where(It.IsAny<Expression<Func<Book, bool>>>()) == q &&
@@ -119,7 +119,7 @@ namespace Library.Infrastructure.Tests.Data
                             q.SingleOrDefaultAsync<int>(It.IsAny<CancellationToken>()) == Task.FromResult(0)));
 
             // Act
-            var result = await _bookRepository.IsISBNUniqueAsync(ISBN);
+            var result = await _bookRepository.IsISBNUniqueAsync(ISBN, bookId);
 
             // Assert
             result.Should().BeTrue();
@@ -130,6 +130,7 @@ namespace Library.Infrastructure.Tests.Data
         {
             // Arrange
             var ISBN = "Non-Unique Title";
+            var bookId = 1;
             _sessionMock.Setup(s => s.QueryOver<Book>())
                         .Returns(Mock.Of<IQueryOver<Book, Book>>(q =>
                             q.Where(It.IsAny<Expression<Func<Book, bool>>>()) == q &&
@@ -137,7 +138,7 @@ namespace Library.Infrastructure.Tests.Data
                             q.SingleOrDefaultAsync<int>(It.IsAny<CancellationToken>()) == Task.FromResult(1)));
 
             // Act
-            var result = await _bookRepository.IsISBNUniqueAsync(ISBN);
+            var result = await _bookRepository.IsISBNUniqueAsync(ISBN, bookId);
 
             // Assert
             result.Should().BeFalse();

@@ -15,7 +15,7 @@ namespace Library.Application.Tests.Validators
         public UpdateBookCommandValidatorTests()
         {
             _unitOfWorkMock = new Mock<IUnitOfWork>();
-            _unitOfWorkMock.Setup(u => u.BookRepository.IsISBNUniqueAsync(It.IsAny<string>())).ReturnsAsync(true);
+            _unitOfWorkMock.Setup(u => u.BookRepository.IsISBNUniqueAsync(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(true);
             _validator = new UpdateBookCommandValidator(_unitOfWorkMock.Object);
         }
 
@@ -69,7 +69,7 @@ namespace Library.Application.Tests.Validators
         {
             // Arrange
             var command = new UpdateBookCommand { ISBN = string.Empty };
-            _unitOfWorkMock.Setup(u => u.BookRepository.IsISBNUniqueAsync(It.IsAny<string>())).ReturnsAsync(false);
+            _unitOfWorkMock.Setup(u => u.BookRepository.IsISBNUniqueAsync(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(false);
 
             // Act
             var result = await _validator.TestValidateAsync(command);

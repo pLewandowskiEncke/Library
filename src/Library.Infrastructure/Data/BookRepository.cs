@@ -57,10 +57,10 @@ namespace Library.Infrastructure.Data
             return await criteria.ListAsync<Book>();
         }
 
-        public async Task<bool> IsISBNUniqueAsync(string ISBN)
+        public async Task<bool> IsISBNUniqueAsync(string ISBN, int? id)
         {
             var result = await _session.QueryOver<Book>()
-                .Where(b => b.ISBN == ISBN)
+                .Where(b => b.ISBN == ISBN && b.Id != id )
                 .Select(Projections.RowCount())
                 .SingleOrDefaultAsync<int>();
 

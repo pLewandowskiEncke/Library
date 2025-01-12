@@ -26,9 +26,9 @@ namespace Library.Application.Validators
                 .When(command => command.ISBN != null);
         }
 
-        private async Task<bool> BeUnique(string ISBN, CancellationToken token)
+        private async Task<bool> BeUnique(BaseBookCommand command, string ISBN, CancellationToken token)
         {
-            return await _unitOfWork.BookRepository.IsISBNUniqueAsync(ISBN);
+            return await _unitOfWork.BookRepository.IsISBNUniqueAsync(ISBN, command.Id);
         }
     }
 }
