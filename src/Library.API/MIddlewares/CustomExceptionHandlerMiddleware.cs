@@ -1,7 +1,6 @@
 using FluentValidation;
 using Library.Shared.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Library.API.Middlewares
 {
@@ -79,7 +78,7 @@ namespace Library.API.Middlewares
                 {
                     Status = StatusCodes.Status500InternalServerError,
                     Title = "Internal Server Error",
-                    Detail = "An unexpected error occurred."
+                    Detail = "Something went wrong"
                 };
             }
 
