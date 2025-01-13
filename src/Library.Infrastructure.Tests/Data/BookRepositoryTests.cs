@@ -54,9 +54,9 @@ namespace Library.Infrastructure.Tests.Data
             _session.Clear();
 
             // Assert
-            var result = await _bookRepository.GetByIdAsync(book.Id);
-            result.Should().NotBeNull();
-            result.Title.Should().Be("Test Book");
+            var retrievedBook = await _session.GetAsync<Book>(book.Id);
+            retrievedBook.Should().NotBeNull();
+            retrievedBook.Title.Should().Be("Test Book");
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace Library.Infrastructure.Tests.Data
         {
             // Arrange
             var book = new Book { Title = "Test Book", Author = "Test Author", ISBN = "1234567890" };
-            await _bookRepository.AddAsync(book);
+            await _session.SaveAsync(book);
             _session.Flush();
             _session.Clear();
 
@@ -81,7 +81,7 @@ namespace Library.Infrastructure.Tests.Data
         {
             // Arrange
             var book = new Book { Title = "Test Book", Author = "Test Author", ISBN = "1234567890" };
-            await _bookRepository.AddAsync(book);
+            await _session.SaveAsync(book);
             _session.Flush();
             _session.Clear();
 
@@ -97,7 +97,7 @@ namespace Library.Infrastructure.Tests.Data
         {
             // Arrange
             var book = new Book { Title = "Test Book", Author = "Test Author", ISBN = "1234567890" };
-            await _bookRepository.AddAsync(book);
+            await _session.SaveAsync(book);
             _session.Flush();
             _session.Clear();
 
@@ -108,7 +108,7 @@ namespace Library.Infrastructure.Tests.Data
             _session.Clear();
 
             // Assert
-            var retrievedBook = await _bookRepository.GetByIdAsync(book.Id);
+            var retrievedBook = await _session.GetAsync<Book>(book.Id);
             retrievedBook.Title.Should().Be("Updated Test Book");
         }
 
@@ -117,7 +117,7 @@ namespace Library.Infrastructure.Tests.Data
         {
             // Arrange
             var book = new Book { Title = "Test Book", Author = "Test Author", ISBN = "1234567890" };
-            await _bookRepository.AddAsync(book);
+            await _session.SaveAsync(book);
             _session.Flush();
             _session.Clear();
 
@@ -127,8 +127,8 @@ namespace Library.Infrastructure.Tests.Data
             _session.Clear();
 
             // Assert
-            Func<Task> act = async () => await _bookRepository.GetByIdAsync(99);
-            await act.Should().ThrowAsync<NotFoundException>();
+            var retrievedBook = await _session.GetAsync<Book>(book.Id);
+            retrievedBook.Should().BeNull();
 
         }
 
@@ -139,7 +139,7 @@ namespace Library.Infrastructure.Tests.Data
             for (int i = 1; i <= 9; i++)
             {
                 var book = new Book { Title = $"Test Book {i}", Author = "Test Author", ISBN = $"123456789{i}" };
-                await _bookRepository.AddAsync(book);
+                await _session.SaveAsync(book);
             }
             _session.Flush();
             _session.Clear();
@@ -171,7 +171,7 @@ namespace Library.Infrastructure.Tests.Data
         {
             // Arrange
             var book = new Book { Title = "Test Book 1", Author = "Test Author", ISBN = "1234567890" };
-            await _bookRepository.AddAsync(book);
+            await _session.SaveAsync(book);
             _session.Flush();
             _session.Clear();
 
@@ -187,7 +187,7 @@ namespace Library.Infrastructure.Tests.Data
         {
             // Arrange
             var book = new Book { Title = "Test Book", Author = "Test Author", ISBN = "1234567890" };
-            await _bookRepository.AddAsync(book);
+            await _session.SaveAsync(book);
             _session.Flush();
             _session.Clear();
 
