@@ -30,7 +30,7 @@ namespace Library.Domain.Tests.Entities
         }
 
         [Fact]
-        public void PlaceOnShelf_WhenBookReturned_ShouldThrowInvalidBookStateException()
+        public void PlaceOnShelf_WhenBookReturned_ShouldTransitionToNextState()
         {
             // Arrange
             _book = new CustomBook(BookStatus.Returned);
@@ -43,16 +43,16 @@ namespace Library.Domain.Tests.Entities
         }
 
         [Fact]
-        public void PlaceOnShelf_WhenBookOnTheShelf_ShouldThrowInvalidBookStateException()
+        public void PlaceOnShelf_WhenBookOnTheShelf_ShouldKeepTheSameState()
         {
             // Arrange
             _book = new CustomBook(BookStatus.OnTheShelf);
 
             // Act
-            Action act = () => _book.PlaceOnShelf();
+            _book.PlaceOnShelf();
 
             // Assert
-            act.Should().Throw<InvalidBookStateException>().WithMessage("The book is already on the shelf.");
+            _book.Status.Should().Be(BookStatus.OnTheShelf);
         }
 
         [Fact]
@@ -84,16 +84,16 @@ namespace Library.Domain.Tests.Entities
         }
 
         [Fact]
-        public void Borrow_WhenBookBorrowed_ShouldThrowInvalidBookStateException()
+        public void Borrow_WhenBookBorrowed_ShouldKeepTheSameState()
         {
             // Arrange
             _book = new CustomBook(BookStatus.Borrowed);
 
             // Act
-            Action act = () => _book.Borrow();
+            _book.Borrow();
 
             // Assert
-            act.Should().Throw<InvalidBookStateException>().WithMessage("The book is already borrowed.");
+            _book.Status.Should().Be(BookStatus.Borrowed);
         }
 
         [Fact]
@@ -164,16 +164,16 @@ namespace Library.Domain.Tests.Entities
         }
 
         [Fact]
-        public void MarkAsDamaged_WhenBookDamaged_ShouldThrowInvalidBookStateException()
+        public void MarkAsDamaged_WhenBookDamaged_ShouldKeepTheSameState()
         {
             // Arrange
             _book = new CustomBook(BookStatus.Damaged);
 
             // Act
-            Action act = () => _book.MarkAsDamaged();
+            _book.MarkAsDamaged();
 
             // Assert
-            act.Should().Throw<InvalidBookStateException>().WithMessage("The book is already marked as damaged.");
+            _book.Status.Should().Be(BookStatus.Damaged);
         }
         #endregion
 
@@ -219,16 +219,16 @@ namespace Library.Domain.Tests.Entities
         }
         
         [Fact]
-        public void Return_WhenBookReturned_ShouldThrowInvalidBookStateException()
+        public void Return_WhenBookReturned_ShouldKeepTheSameState()
         {
             // Arrange            
             _book = new CustomBook(BookStatus.Returned);
 
             // Act
-            Action act = () => _book.Return();
+            _book.Return();
 
             // Assert
-            act.Should().Throw<InvalidBookStateException>().WithMessage("The book is already returned.");
+            _book.Status.Should().Be(BookStatus.Returned);
         }
         #endregion
 

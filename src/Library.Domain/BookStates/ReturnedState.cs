@@ -16,7 +16,7 @@ namespace Library.Domain.BookStates
 
         public IBookState Return(Book book)
         {
-            throw new InvalidBookStateException("The book is already returned.");
+            return new ReturnedState();
         }
 
         public IBookState MarkAsDamaged(Book book)

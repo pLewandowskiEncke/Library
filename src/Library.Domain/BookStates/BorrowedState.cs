@@ -11,7 +11,7 @@ namespace Library.Domain.BookStates
 
         public IBookState Borrow(Book book)
         {
-            throw new InvalidBookStateException("The book is already borrowed.");
+            return new BorrowedState();
         }
 
         public IBookState Return(Book book)

@@ -21,7 +21,7 @@ namespace Library.Domain.BookStates
 
         public IBookState MarkAsDamaged(Book book)
         {
-            throw new InvalidBookStateException("The book is already marked as damaged.");
+            return new DamagedState();
         }
 
         public IBookState PlaceOnShelf(Book book)
