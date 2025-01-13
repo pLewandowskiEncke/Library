@@ -7,7 +7,6 @@ using Library.Application.DTOs;
 using Library.Application.Queries.GetBookById;
 using Library.Application.Queries.GetBooks;
 using Library.Controllers;
-using Library.Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -60,10 +59,10 @@ namespace Library.API.Tests.Controllers
             var result = await _controller.CreateBook(command);
 
             // Assert
-            result.Should().BeOfType<ActionResult<BookDTO>>();
-            var returnedResult = result.Result as CreatedResult;
-            returnedResult.Value.Should().Be(bookDto);
-            returnedResult.Location.Should().Contain($"foo");
+            result.Should().BeOfType<CreatedResult>();
+            var createdResult = result as CreatedResult;
+            createdResult.Value.Should().Be(bookDto);
+            createdResult.Location.Should().Contain($"foo");
         }
 
         [Fact]
@@ -100,9 +99,9 @@ namespace Library.API.Tests.Controllers
             var result = await _controller.UpdateBook(bookId, updateBookCommand);
 
             // Assert
-            result.Should().BeOfType<ActionResult<BookDTO>>();
-            var returnedResult = result.Result as OkObjectResult;
-            returnedResult.Value.Should().Be(updatedBook);
+            result.Should().BeOfType<OkObjectResult>();
+            var okResult = result as OkObjectResult;
+            okResult.Value.Should().Be(updatedBook);
         }
 
         [Fact]
@@ -119,8 +118,8 @@ namespace Library.API.Tests.Controllers
             var result = await _controller.GetBookById(bookId);
 
             // Assert
-            result.Should().BeOfType<ActionResult<BookDTO>>();
-            var okResult = result.Result as OkObjectResult;
+            result.Should().BeOfType<OkObjectResult>();
+            var okResult = result as OkObjectResult;
             okResult.Value.Should().Be(bookDto);
         }
 
@@ -138,8 +137,8 @@ namespace Library.API.Tests.Controllers
             var result = await _controller.GetBooks(query);
 
             // Assert
-            result.Should().BeOfType<ActionResult<BookListDTO>>();
-            var okResult = result.Result as OkObjectResult;
+            result.Should().BeOfType<OkObjectResult>();
+            var okResult = result as OkObjectResult;
             okResult.Value.Should().BeEquivalentTo(books);
         }
     }

@@ -26,7 +26,7 @@ namespace Library.Controllers
         [ProducesResponseType(typeof(BookDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<BookDTO>> GetBookById(int id)
+        public async Task<IActionResult> GetBookById(int id)
         {
             var query = new GetBookByIdQuery(id);
             var result = await _mediator.Send(query);
@@ -36,7 +36,7 @@ namespace Library.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(BookListDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<BookListDTO>> GetBooks([FromQuery] GetBooksQuery query)
+        public async Task<IActionResult> GetBooks([FromQuery] GetBooksQuery query)
         {
             var result = await _mediator.Send(query);
             return Ok(result);
@@ -46,7 +46,7 @@ namespace Library.Controllers
         [ProducesResponseType(typeof(BookDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<BookDTO>> CreateBook(CreateBookCommand command)
+        public async Task<IActionResult> CreateBook(CreateBookCommand command)
         {
             var result = await _mediator.Send(command);
 
@@ -60,7 +60,7 @@ namespace Library.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<BookDTO>> UpdateBook(int id, [FromBody] UpdateBookCommand command)
+        public async Task<IActionResult> UpdateBook(int id, [FromBody] UpdateBookCommand command)
         {
             command.Id = id;
             var result = await _mediator.Send(command);
@@ -72,7 +72,7 @@ namespace Library.Controllers
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<BookDTO>> PatchBook(int id, [FromBody] PatchBookCommand command)
+        public async Task<IActionResult> PatchBook(int id, [FromBody] PatchBookCommand command)
         {
             command.Id = id;
             var result = await _mediator.Send(command);
