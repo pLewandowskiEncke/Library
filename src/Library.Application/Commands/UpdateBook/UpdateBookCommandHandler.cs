@@ -24,10 +24,6 @@ namespace Library.Application.Commands.CreateBook
         public async Task<BookDTO> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
         {
             var book = await _unitOfWork.BookRepository.GetByIdAsync(request.Id);
-            if (book == null)
-            {
-                throw new NotFoundException("Book not found");
-            }
             _mapper.Map(request, book);
             if (request.Status.HasValue)
             {

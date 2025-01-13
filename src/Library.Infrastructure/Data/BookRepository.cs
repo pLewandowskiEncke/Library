@@ -1,5 +1,6 @@
 using Library.Domain.Entities;
 using Library.Domain.Interfaces;
+using Library.Shared.Exceptions;
 using NHibernate;
 using NHibernate.Criterion;
 using System.Collections.Generic;
@@ -18,7 +19,12 @@ namespace Library.Infrastructure.Data
 
         public async Task<Book> GetByIdAsync(int id)
         {
-            return await _session.GetAsync<Book>(id);
+            var book = await _session.GetAsync<Book>(id);
+            if (book == null)
+            {
+                throw new NotFoundException("Book not found");
+            }
+            return book;
         }
 
         public async Task AddAsync(Book book)

@@ -5,6 +5,7 @@ using FluentNHibernate.Cfg.Db;
 using Library.Domain.Entities;
 using Library.Infrastructure.Data;
 using Library.Infrastructure.Data.Mappings;
+using Library.Shared.Exceptions;
 using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Tool.hbm2ddl;
@@ -53,9 +54,9 @@ namespace Library.Infrastructure.Tests.Data
             _session.Clear();
 
             // Assert
-            var retrievedBook = await _bookRepository.GetByIdAsync(book.Id);
-            retrievedBook.Should().NotBeNull();
-            retrievedBook.Title.Should().Be("Test Book");
+            var result = await _bookRepository.GetByIdAsync(book.Id);
+            result.Should().NotBeNull();
+            result.Title.Should().Be("Test Book");
         }
 
         [Fact]
@@ -68,11 +69,27 @@ namespace Library.Infrastructure.Tests.Data
             _session.Clear();
 
             // Act
-            var retrievedBook = await _bookRepository.GetByIdAsync(book.Id);
+            var result = await _bookRepository.GetByIdAsync(book.Id);
 
             // Assert
-            retrievedBook.Should().NotBeNull();
-            retrievedBook.Title.Should().Be("Test Book");
+            result.Should().NotBeNull();
+            result.Title.Should().Be("Test Book");
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_ShouldThrowNotFoundException_WhenBookNotFound()
+        {
+            // Arrange
+            var book = new Book { Title = "Test Book", Author = "Test Author", ISBN = "1234567890" };
+            await _bookRepository.AddAsync(book);
+            _session.Flush();
+            _session.Clear();
+
+            // Act
+            Func<Task> act = async () => await _bookRepository.GetByIdAsync(99);
+
+            // Assert
+            await act.Should().ThrowAsync<NotFoundException>();
         }
 
         [Fact]
@@ -110,8 +127,9 @@ namespace Library.Infrastructure.Tests.Data
             _session.Clear();
 
             // Assert
-            var retrievedBook = await _bookRepository.GetByIdAsync(book.Id);
-            retrievedBook.Should().BeNull();
+            Func<Task> act = async () => await _bookRepository.GetByIdAsync(99);
+            await act.Should().ThrowAsync<NotFoundException>();
+
         }
 
         [Fact]

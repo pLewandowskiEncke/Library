@@ -47,29 +47,5 @@ namespace Library.Application.Tests.Commands
             _unitOfWork.Verify(u => u.BeginTransaction(), Times.Once);
             _unitOfWork.Verify(u => u.Commit(), Times.Once);
         }
-
-        [Fact]
-        public async Task Handle_ShouldThrowNotFoundException_WhenBookDoesNotExist()
-        {
-            // Arrange
-            var bookId = 1;
-            _unitOfWork.Setup(u => u.BookRepository.GetByIdAsync(bookId)).ReturnsAsync(null as Book);
-            _unitOfWork.Setup(u => u.BeginTransaction());
-            _unitOfWork.Setup(u => u.Commit());
-
-            var command = new DeleteBookCommand { Id = bookId };
-
-            // Act
-            Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
-
-            // Assert
-            await act.Should().ThrowAsync<NotFoundException>()
-                .WithMessage("Book not found");
-
-            _unitOfWork.Verify(u => u.BookRepository.GetByIdAsync(bookId), Times.Once);
-            _unitOfWork.Verify(u => u.BookRepository.DeleteAsync(It.IsAny<Book>()), Times.Never);
-            _unitOfWork.Verify(u => u.BeginTransaction(), Times.Never);
-            _unitOfWork.Verify(u => u.Commit(), Times.Never);
-        }
     }
 }

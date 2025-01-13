@@ -31,22 +31,6 @@ namespace Library.Application.Tests.Commands
         }
 
         [Fact]
-        public async Task Handle_ShouldThrowNotFoundException_WhenBookNotFound()
-        {
-            // Arrange
-            var command = new PatchBookCommand { Id = 1 };
-            _unitOfWorkMock.Setup(u => u.BookRepository.GetByIdAsync(It.IsAny<int>()))
-                           .ReturnsAsync(null as Book);
-
-            // Act
-            var act = async () => await _handler.Handle(command, CancellationToken.None);
-
-            // Assert
-            await act.Should().ThrowAsync<NotFoundException>()
-                     .WithMessage("Book not found");
-        }
-
-        [Fact]
         public async Task Handle_ShouldUpdatesBook_WhenValidCommandProvided()
         {
             // Arrange

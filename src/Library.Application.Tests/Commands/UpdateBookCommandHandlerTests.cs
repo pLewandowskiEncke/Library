@@ -25,23 +25,6 @@ namespace Library.Application.Tests.Commands
         }
 
         [Fact]
-        public async Task Handle_ShouldThrowNotFoundException_WhenBookNotFound()
-        {
-            // Arrange
-            var command = new UpdateBookCommand { Id = 1, Status = BookStatus.Borrowed };
-            _mocker.GetMock<IUnitOfWork>()
-                .Setup(u => u.BookRepository.GetByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync((Book?)null);
-
-            // Act
-            Func<Task> act = async () => await _handler.Handle(command, CancellationToken.None);
-
-            // Assert
-            await act.Should().ThrowAsync<NotFoundException>()
-                .WithMessage("Book not found");
-        }
-
-        [Fact]
         public async Task Handle_ShouldThrowInvalidBookStateException_WhenInvalidState()
         {
             // Arrange

@@ -1,7 +1,6 @@
 using AutoMapper;
 using Library.Application.DTOs;
 using Library.Domain.Interfaces;
-using Library.Shared.Exceptions;
 using MediatR;
 
 namespace Library.Application.Commands.PatchBook
@@ -20,10 +19,6 @@ namespace Library.Application.Commands.PatchBook
         public async Task<BookDTO> Handle(PatchBookCommand request, CancellationToken cancellationToken)
         {
             var book = await _unitOfWork.BookRepository.GetByIdAsync(request.Id);
-            if (book == null)
-            {
-                throw new NotFoundException("Book not found");
-            }
             _mapper.Map(request, book);
             if (request.Status.HasValue)
             {
